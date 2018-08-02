@@ -1,0 +1,35 @@
+﻿
+@model SurveyTool.Models.Question
+
+@{
+    ViewBag.Title = "Edit Question";
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/cleditor")
+    @Scripts.Render("~/bundles/models")
+
+    <script type="text/javascript">
+        $(function() {
+            ko.validation.init({ insertMessages: false });
+            //ko.applyBindings(new QuestionModel(@Html.Raw(Model.ToJson())));
+            ko.applyBindings(new QuestionModel(@Html.Raw(Model.ToJson())));
+            $('#survey-form').submit(function() {
+                var $form = $(this),
+                    url = $form.attr('action'),
+                    params = $form.serialize();
+
+                var result = $.post(url, params);
+
+                result.error(function() {
+                    toastr.error('An error occurred while attempting to save this survey.');
+                });
+
+                return false;
+            });
+        });
+    </script>
+}
+
+@Html.EditorForModel(new { title = "Edit Question", url = Url.Action("Edit", new { id = Model.Id }) })

@@ -1,0 +1,105 @@
+﻿@model SurveyTool.Models.Survey
+
+@{
+    ViewBag.Title = Model.Name;
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
+
+            $(document).on('click', 'a[data-toggle=comment]', function() {
+                var id = $(this).attr('href');
+                $(id).toggle();
+                return false;
+            });
+        });
+    </script>
+    
+}
+
+<div class="page-header">
+    <h3>@ViewBag.Title</h3>
+</div>
+
+<form action="@Url.Action("Create", "Responses", new {surveyId = Request["surveyId"]})" method="post">
+    <div class="well well-small">
+        <h4>Questions</h4>
+    </div>
+    <ul class="unstyled bordered skip-first">
+        @foreach (var question in Model.Questions)
+        {
+            <li class="row">
+                <div class="span12">
+                    <input type="hidden" name="Answers.Index" value="@question.Id" />
+                    <input type="hidden" name="Answers[@question.Id].QuestionId" value="@question.Id" />
+
+                    @if (@question.IsRequired.Equals("No"))
+                    {
+                        <span>@Html.Raw(question.Body)</span>
+                    }
+                    else
+                    {
+                        <span>@Html.Raw(question.Body) <span style="color:red">*</span></span>
+                    }
+                    <br />
+
+
+                    @if (question.Type == "Text")
+                    {
+                        <br />
+                        if (@question.IsRequired.Equals("Yes"))
+                        {
+                            <input class="span6" type="text" name="Answers[@question.Id].Value" placeholder="Enter your answer." required />
+                        }
+                        else
+                        {
+                            <input class="span6" type="text" name="Answers[@question.Id].Value" placeholder="Enter your answer." />
+                        }
+
+                    }
+                    @if (question.Type == "Multitext")
+                    {
+                        <br />
+                        if (@question.IsRequired.Equals("Yes"))
+                        {
+                            <textarea class="span6" name="Answers[@question.Id].Value" placeholder="Enter your answer." required></textarea>
+                        }
+                        else
+                        {
+                            <textarea class="span6" name="Answers[@question.Id].Value" placeholder="Enter your answer." ></textarea>
+                        }
+                    }
+                    @if (question.Type == "RadioBox")
+                    {
+                        if (@question.IsRequired.Equals("Yes"))
+                        {
+                            foreach (var option in question.Options)
+                            {
+                                <input type="radio" name="Answers[@question.Id].Value" value="@option.Id" required> @Html.Raw(@option.Text)<br>
+                            }
+                        }
+                        else
+                        {
+                            foreach (var option in question.Options)
+                            {
+                                <input type="radio" name="Answers[@question.Id].Value" value="@option.Id"> @Html.Raw(@option.Text)<br>
+                            }
+                        }
+                        /**/
+                        <br />
+
+                    }
+                </div>
+                
+            </li>
+        }
+    </ul>
+    
+    <div class="form-actions">
+        <input class="btn btn-primary" type="submit" name="action" value="Save" />
+        <a class="btn" href="@Url.Action("Index", "DashBoard")">Cancel</a>
+    </div>
+</form>
